@@ -1,0 +1,1077 @@
+<!DOCTYPE html><html lang='ru'><head><meta charset='utf-8'>
+<title>Отчёт о покрытии тестами</title>
+<style>body{font-family:sans-serif;margin:24px}table{border-collapse:collapse}td,th{border:1px solid #bbb;padding:4px 10px;text-align:left}pre{background:#f6f6f6;padding:8px;font-size:13px}.miss{background:#ffd6d6}.hit{background:#e2f5e2}.num{color:#888}</style></head><body>
+<h1>Отчёт о покрытии тестами (по строкам)</h1>
+<p>Запущено тестов: 95, ошибок: 0, падений: 0.</p>
+<p><b>Сервисный слой (app/services): 99.4%</b> (180 из 181 строк).<br>Весь пакет app: 98.9% (749 из 757 строк).</p>
+<table><tr><th>Файл</th><th>Строк</th><th>Покрыто</th><th>%</th></tr>
+<tr><td><a href='#app/__init__.py'>app/__init__.py</a></td><td>26</td><td>26</td><td>100.0</td></tr>
+<tr><td><a href='#app/api/__init__.py'>app/api/__init__.py</a></td><td>1</td><td>1</td><td>100.0</td></tr>
+<tr><td><a href='#app/api/auth.py'>app/api/auth.py</a></td><td>11</td><td>11</td><td>100.0</td></tr>
+<tr><td><a href='#app/api/deps.py'>app/api/deps.py</a></td><td>55</td><td>54</td><td>98.2</td></tr>
+<tr><td><a href='#app/api/docs.py'>app/api/docs.py</a></td><td>11</td><td>11</td><td>100.0</td></tr>
+<tr><td><a href='#app/api/tickets.py'>app/api/tickets.py</a></td><td>49</td><td>49</td><td>100.0</td></tr>
+<tr><td><a href='#app/config.py'>app/config.py</a></td><td>7</td><td>7</td><td>100.0</td></tr>
+<tr><td><a href='#app/db.py'>app/db.py</a></td><td>15</td><td>15</td><td>100.0</td></tr>
+<tr><td><a href='#app/errors.py'>app/errors.py</a></td><td>16</td><td>16</td><td>100.0</td></tr>
+<tr><td><a href='#app/migrate.py'>app/migrate.py</a></td><td>29</td><td>23</td><td>79.3</td></tr>
+<tr><td><a href='#app/models.py'>app/models.py</a></td><td>19</td><td>19</td><td>100.0</td></tr>
+<tr><td><a href='#app/openapi.py'>app/openapi.py</a></td><td>207</td><td>207</td><td>100.0</td></tr>
+<tr><td><a href='#app/repositories/__init__.py'>app/repositories/__init__.py</a></td><td>1</td><td>1</td><td>100.0</td></tr>
+<tr><td><a href='#app/repositories/comments.py'>app/repositories/comments.py</a></td><td>18</td><td>18</td><td>100.0</td></tr>
+<tr><td><a href='#app/repositories/tickets.py'>app/repositories/tickets.py</a></td><td>65</td><td>65</td><td>100.0</td></tr>
+<tr><td><a href='#app/repositories/users.py'>app/repositories/users.py</a></td><td>20</td><td>20</td><td>100.0</td></tr>
+<tr><td><a href='#app/security.py'>app/security.py</a></td><td>26</td><td>26</td><td>100.0</td></tr>
+<tr><td><a href='#app/services/__init__.py'>app/services/__init__.py</a></td><td>1</td><td>1</td><td>100.0</td></tr>
+<tr><td><a href='#app/services/auth.py'>app/services/auth.py</a></td><td>42</td><td>42</td><td>100.0</td></tr>
+<tr><td><a href='#app/services/comments.py'>app/services/comments.py</a></td><td>18</td><td>18</td><td>100.0</td></tr>
+<tr><td><a href='#app/services/common.py'>app/services/common.py</a></td><td>9</td><td>9</td><td>100.0</td></tr>
+<tr><td><a href='#app/services/tickets.py'>app/services/tickets.py</a></td><td>111</td><td>110</td><td>99.1</td></tr>
+</table>
+<h3 id='app/__init__.py'>app/__init__.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from flask import Flask, jsonify</span>
+<span class='hit'><span class='num'>   2</span>  from werkzeug.exceptions import HTTPException</span>
+<span class=''><span class='num'>   3</span>  </span>
+<span class='hit'><span class='num'>   4</span>  from app.api.auth import auth_bp</span>
+<span class='hit'><span class='num'>   5</span>  from app.api.docs import docs_bp</span>
+<span class='hit'><span class='num'>   6</span>  from app.api.tickets import tickets_bp</span>
+<span class='hit'><span class='num'>   7</span>  from app.config import Config</span>
+<span class='hit'><span class='num'>   8</span>  from app.db import close_db</span>
+<span class='hit'><span class='num'>   9</span>  from app.errors import AppError</span>
+<span class=''><span class='num'>  10</span>  </span>
+<span class=''><span class='num'>  11</span>  </span>
+<span class='hit'><span class='num'>  12</span>  def create_app(overrides=None):</span>
+<span class='hit'><span class='num'>  13</span>      app = Flask(__name__)</span>
+<span class='hit'><span class='num'>  14</span>      app.json.ensure_ascii = False</span>
+<span class='hit'><span class='num'>  15</span>      app.config.from_object(Config)</span>
+<span class='hit'><span class='num'>  16</span>      if overrides:</span>
+<span class='hit'><span class='num'>  17</span>          app.config.update(overrides)</span>
+<span class=''><span class='num'>  18</span>  </span>
+<span class='hit'><span class='num'>  19</span>      app.teardown_appcontext(close_db)</span>
+<span class='hit'><span class='num'>  20</span>      app.register_blueprint(auth_bp)</span>
+<span class='hit'><span class='num'>  21</span>      app.register_blueprint(tickets_bp)</span>
+<span class='hit'><span class='num'>  22</span>      app.register_blueprint(docs_bp)</span>
+<span class=''><span class='num'>  23</span>  </span>
+<span class='hit'><span class='num'>  24</span>      @app.errorhandler(AppError)</span>
+<span class='hit'><span class='num'>  25</span>      def handle_app_error(error):</span>
+<span class='hit'><span class='num'>  26</span>          return jsonify({&quot;error&quot;: error.message}), error.status_code</span>
+<span class=''><span class='num'>  27</span>  </span>
+<span class='hit'><span class='num'>  28</span>      @app.errorhandler(HTTPException)</span>
+<span class='hit'><span class='num'>  29</span>      def handle_http_error(error):</span>
+<span class='hit'><span class='num'>  30</span>          return jsonify({&quot;error&quot;: error.description}), error.code</span>
+<span class=''><span class='num'>  31</span>  </span>
+<span class='hit'><span class='num'>  32</span>      return app</span>
+</pre>
+<h3 id='app/api/__init__.py'>app/api/__init__.py</h3><pre>
+</pre>
+<h3 id='app/api/auth.py'>app/api/auth.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from flask import Blueprint, jsonify</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class='hit'><span class='num'>   3</span>  from app.api.deps import auth_service, json_body</span>
+<span class=''><span class='num'>   4</span>  </span>
+<span class='hit'><span class='num'>   5</span>  auth_bp = Blueprint(&quot;auth&quot;, __name__, url_prefix=&quot;/auth&quot;)</span>
+<span class=''><span class='num'>   6</span>  </span>
+<span class=''><span class='num'>   7</span>  </span>
+<span class='hit'><span class='num'>   8</span>  @auth_bp.post(&quot;/register&quot;)</span>
+<span class='hit'><span class='num'>   9</span>  def register():</span>
+<span class='hit'><span class='num'>  10</span>      user = auth_service().register(json_body())</span>
+<span class='hit'><span class='num'>  11</span>      return jsonify(user), 201</span>
+<span class=''><span class='num'>  12</span>  </span>
+<span class=''><span class='num'>  13</span>  </span>
+<span class='hit'><span class='num'>  14</span>  @auth_bp.post(&quot;/login&quot;)</span>
+<span class='hit'><span class='num'>  15</span>  def login():</span>
+<span class='hit'><span class='num'>  16</span>      return jsonify(auth_service().login(json_body()))</span>
+</pre>
+<h3 id='app/api/deps.py'>app/api/deps.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from functools import wraps</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class='hit'><span class='num'>   3</span>  import jwt</span>
+<span class='hit'><span class='num'>   4</span>  from flask import current_app, g, request</span>
+<span class=''><span class='num'>   5</span>  </span>
+<span class='hit'><span class='num'>   6</span>  from app.db import get_db</span>
+<span class='hit'><span class='num'>   7</span>  from app.errors import AuthError, ValidationError</span>
+<span class='hit'><span class='num'>   8</span>  from app.repositories.comments import CommentRepository</span>
+<span class='hit'><span class='num'>   9</span>  from app.repositories.tickets import TicketRepository</span>
+<span class='hit'><span class='num'>  10</span>  from app.repositories.users import UserRepository</span>
+<span class='hit'><span class='num'>  11</span>  from app.security import decode_token</span>
+<span class='hit'><span class='num'>  12</span>  from app.services.auth import AuthService</span>
+<span class='hit'><span class='num'>  13</span>  from app.services.comments import CommentService</span>
+<span class='hit'><span class='num'>  14</span>  from app.services.tickets import TicketService</span>
+<span class=''><span class='num'>  15</span>  </span>
+<span class=''><span class='num'>  16</span>  </span>
+<span class='hit'><span class='num'>  17</span>  def auth_service():</span>
+<span class='hit'><span class='num'>  18</span>      cfg = current_app.config</span>
+<span class='hit'><span class='num'>  19</span>      return AuthService(</span>
+<span class='hit'><span class='num'>  20</span>          UserRepository(get_db()),</span>
+<span class='hit'><span class='num'>  21</span>          cfg[&quot;SECRET_KEY&quot;],</span>
+<span class='hit'><span class='num'>  22</span>          cfg[&quot;JWT_EXPIRES_MINUTES&quot;],</span>
+<span class='hit'><span class='num'>  23</span>          cfg[&quot;PASSWORD_ITERATIONS&quot;],</span>
+<span class=''><span class='num'>  24</span>      )</span>
+<span class=''><span class='num'>  25</span>  </span>
+<span class=''><span class='num'>  26</span>  </span>
+<span class='hit'><span class='num'>  27</span>  def ticket_service():</span>
+<span class='hit'><span class='num'>  28</span>      conn = get_db()</span>
+<span class='hit'><span class='num'>  29</span>      return TicketService(TicketRepository(conn), UserRepository(conn))</span>
+<span class=''><span class='num'>  30</span>  </span>
+<span class=''><span class='num'>  31</span>  </span>
+<span class='hit'><span class='num'>  32</span>  def comment_service():</span>
+<span class='hit'><span class='num'>  33</span>      conn = get_db()</span>
+<span class='hit'><span class='num'>  34</span>      return CommentService(CommentRepository(conn), TicketRepository(conn))</span>
+<span class=''><span class='num'>  35</span>  </span>
+<span class=''><span class='num'>  36</span>  </span>
+<span class='hit'><span class='num'>  37</span>  def json_body():</span>
+<span class='hit'><span class='num'>  38</span>      data = request.get_json(silent=True)</span>
+<span class='hit'><span class='num'>  39</span>      if not isinstance(data, dict):</span>
+<span class='hit'><span class='num'>  40</span>          raise ValidationError(&quot;Тело запроса должно быть JSON-объектом&quot;)</span>
+<span class='hit'><span class='num'>  41</span>      return data</span>
+<span class=''><span class='num'>  42</span>  </span>
+<span class=''><span class='num'>  43</span>  </span>
+<span class='hit'><span class='num'>  44</span>  def int_arg(name, default=None):</span>
+<span class='hit'><span class='num'>  45</span>      raw = request.args.get(name)</span>
+<span class='hit'><span class='num'>  46</span>      if raw is None:</span>
+<span class='hit'><span class='num'>  47</span>          return default</span>
+<span class='hit'><span class='num'>  48</span>      try:</span>
+<span class='hit'><span class='num'>  49</span>          return int(raw)</span>
+<span class='hit'><span class='num'>  50</span>      except ValueError:</span>
+<span class='hit'><span class='num'>  51</span>          raise ValidationError(f&quot;Параметр {name} должен быть числом&quot;)</span>
+<span class=''><span class='num'>  52</span>  </span>
+<span class=''><span class='num'>  53</span>  </span>
+<span class='hit'><span class='num'>  54</span>  def login_required(view):</span>
+<span class='hit'><span class='num'>  55</span>      @wraps(view)</span>
+<span class='hit'><span class='num'>  56</span>      def wrapper(*args, **kwargs):</span>
+<span class='hit'><span class='num'>  57</span>          header = request.headers.get(&quot;Authorization&quot;, &quot;&quot;)</span>
+<span class='hit'><span class='num'>  58</span>          if not header.startswith(&quot;Bearer &quot;):</span>
+<span class='hit'><span class='num'>  59</span>              raise AuthError(&quot;Требуется токен авторизации&quot;)</span>
+<span class='hit'><span class='num'>  60</span>          try:</span>
+<span class='hit'><span class='num'>  61</span>              payload = decode_token(header[len(&quot;Bearer &quot;):], current_app.config[&quot;SECRET_KEY&quot;])</span>
+<span class='hit'><span class='num'>  62</span>          except jwt.PyJWTError:</span>
+<span class='hit'><span class='num'>  63</span>              raise AuthError(&quot;Недействительный или просроченный токен&quot;)</span>
+<span class='hit'><span class='num'>  64</span>          user = UserRepository(get_db()).get_by_id(int(payload[&quot;sub&quot;]))</span>
+<span class='hit'><span class='num'>  65</span>          if user is None:</span>
+<span class='miss'><span class='num'>  66</span>              raise AuthError(&quot;Пользователь не найден&quot;)</span>
+<span class='hit'><span class='num'>  67</span>          g.current_user = user</span>
+<span class='hit'><span class='num'>  68</span>          return view(*args, **kwargs)</span>
+<span class=''><span class='num'>  69</span>  </span>
+<span class='hit'><span class='num'>  70</span>      return wrapper</span>
+</pre>
+<h3 id='app/api/docs.py'>app/api/docs.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from flask import Blueprint, jsonify</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class='hit'><span class='num'>   3</span>  from app.openapi import build_spec</span>
+<span class=''><span class='num'>   4</span>  </span>
+<span class='hit'><span class='num'>   5</span>  docs_bp = Blueprint(&quot;docs&quot;, __name__)</span>
+<span class=''><span class='num'>   6</span>  </span>
+<span class='hit'><span class='num'>   7</span>  SWAGGER_PAGE = &quot;&quot;&quot;&lt;!DOCTYPE html&gt;</span>
+<span class=''><span class='num'>   8</span>  &lt;html lang=&quot;ru&quot;&gt;</span>
+<span class=''><span class='num'>   9</span>  &lt;head&gt;</span>
+<span class=''><span class='num'>  10</span>    &lt;meta charset=&quot;utf-8&quot;&gt;</span>
+<span class=''><span class='num'>  11</span>    &lt;title&gt;Сервис заявок - Swagger UI&lt;/title&gt;</span>
+<span class=''><span class='num'>  12</span>    &lt;link rel=&quot;stylesheet&quot; href=&quot;https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css&quot;&gt;</span>
+<span class=''><span class='num'>  13</span>  &lt;/head&gt;</span>
+<span class=''><span class='num'>  14</span>  &lt;body&gt;</span>
+<span class=''><span class='num'>  15</span>    &lt;div id=&quot;swagger-ui&quot;&gt;&lt;/div&gt;</span>
+<span class=''><span class='num'>  16</span>    &lt;script src=&quot;https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js&quot;&gt;&lt;/script&gt;</span>
+<span class=''><span class='num'>  17</span>    &lt;script&gt;</span>
+<span class=''><span class='num'>  18</span>      window.ui = SwaggerUIBundle({url: &quot;/openapi.json&quot;, dom_id: &quot;#swagger-ui&quot;});</span>
+<span class=''><span class='num'>  19</span>    &lt;/script&gt;</span>
+<span class=''><span class='num'>  20</span>  &lt;/body&gt;</span>
+<span class=''><span class='num'>  21</span>  &lt;/html&gt;</span>
+<span class=''><span class='num'>  22</span>  &quot;&quot;&quot;</span>
+<span class=''><span class='num'>  23</span>  </span>
+<span class=''><span class='num'>  24</span>  </span>
+<span class='hit'><span class='num'>  25</span>  @docs_bp.get(&quot;/openapi.json&quot;)</span>
+<span class='hit'><span class='num'>  26</span>  def openapi_json():</span>
+<span class='hit'><span class='num'>  27</span>      return jsonify(build_spec())</span>
+<span class=''><span class='num'>  28</span>  </span>
+<span class=''><span class='num'>  29</span>  </span>
+<span class='hit'><span class='num'>  30</span>  @docs_bp.get(&quot;/docs&quot;)</span>
+<span class='hit'><span class='num'>  31</span>  def swagger_ui():</span>
+<span class='hit'><span class='num'>  32</span>      return SWAGGER_PAGE</span>
+</pre>
+<h3 id='app/api/tickets.py'>app/api/tickets.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from flask import Blueprint, g, jsonify, request</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class='hit'><span class='num'>   3</span>  from app.api.deps import (</span>
+<span class=''><span class='num'>   4</span>      comment_service,</span>
+<span class=''><span class='num'>   5</span>      int_arg,</span>
+<span class=''><span class='num'>   6</span>      json_body,</span>
+<span class=''><span class='num'>   7</span>      login_required,</span>
+<span class=''><span class='num'>   8</span>      ticket_service,</span>
+<span class=''><span class='num'>   9</span>  )</span>
+<span class=''><span class='num'>  10</span>  </span>
+<span class='hit'><span class='num'>  11</span>  tickets_bp = Blueprint(&quot;tickets&quot;, __name__, url_prefix=&quot;/tickets&quot;)</span>
+<span class=''><span class='num'>  12</span>  </span>
+<span class=''><span class='num'>  13</span>  </span>
+<span class='hit'><span class='num'>  14</span>  @tickets_bp.get(&quot;&quot;)</span>
+<span class='hit'><span class='num'>  15</span>  @login_required</span>
+<span class='hit'><span class='num'>  16</span>  def list_tickets():</span>
+<span class='hit'><span class='num'>  17</span>      result = ticket_service().list(</span>
+<span class='hit'><span class='num'>  18</span>          status=request.args.get(&quot;status&quot;),</span>
+<span class='hit'><span class='num'>  19</span>          priority=request.args.get(&quot;priority&quot;),</span>
+<span class='hit'><span class='num'>  20</span>          assignee_id=int_arg(&quot;assignee_id&quot;),</span>
+<span class='hit'><span class='num'>  21</span>          page=int_arg(&quot;page&quot;, 1),</span>
+<span class='hit'><span class='num'>  22</span>          page_size=int_arg(&quot;page_size&quot;, 10),</span>
+<span class=''><span class='num'>  23</span>      )</span>
+<span class='hit'><span class='num'>  24</span>      return jsonify(result)</span>
+<span class=''><span class='num'>  25</span>  </span>
+<span class=''><span class='num'>  26</span>  </span>
+<span class='hit'><span class='num'>  27</span>  @tickets_bp.post(&quot;&quot;)</span>
+<span class='hit'><span class='num'>  28</span>  @login_required</span>
+<span class='hit'><span class='num'>  29</span>  def create_ticket():</span>
+<span class='hit'><span class='num'>  30</span>      ticket = ticket_service().create(g.current_user, json_body())</span>
+<span class='hit'><span class='num'>  31</span>      return jsonify(ticket), 201</span>
+<span class=''><span class='num'>  32</span>  </span>
+<span class=''><span class='num'>  33</span>  </span>
+<span class='hit'><span class='num'>  34</span>  @tickets_bp.get(&quot;/&lt;int:ticket_id&gt;&quot;)</span>
+<span class='hit'><span class='num'>  35</span>  @login_required</span>
+<span class='hit'><span class='num'>  36</span>  def get_ticket(ticket_id):</span>
+<span class='hit'><span class='num'>  37</span>      return jsonify(ticket_service().get(ticket_id))</span>
+<span class=''><span class='num'>  38</span>  </span>
+<span class=''><span class='num'>  39</span>  </span>
+<span class='hit'><span class='num'>  40</span>  @tickets_bp.put(&quot;/&lt;int:ticket_id&gt;&quot;)</span>
+<span class='hit'><span class='num'>  41</span>  @login_required</span>
+<span class='hit'><span class='num'>  42</span>  def update_ticket(ticket_id):</span>
+<span class='hit'><span class='num'>  43</span>      return jsonify(ticket_service().update(g.current_user, ticket_id, json_body()))</span>
+<span class=''><span class='num'>  44</span>  </span>
+<span class=''><span class='num'>  45</span>  </span>
+<span class='hit'><span class='num'>  46</span>  @tickets_bp.delete(&quot;/&lt;int:ticket_id&gt;&quot;)</span>
+<span class='hit'><span class='num'>  47</span>  @login_required</span>
+<span class='hit'><span class='num'>  48</span>  def delete_ticket(ticket_id):</span>
+<span class='hit'><span class='num'>  49</span>      ticket_service().delete(g.current_user, ticket_id)</span>
+<span class='hit'><span class='num'>  50</span>      return &quot;&quot;, 204</span>
+<span class=''><span class='num'>  51</span>  </span>
+<span class=''><span class='num'>  52</span>  </span>
+<span class='hit'><span class='num'>  53</span>  @tickets_bp.patch(&quot;/&lt;int:ticket_id&gt;/status&quot;)</span>
+<span class='hit'><span class='num'>  54</span>  @login_required</span>
+<span class='hit'><span class='num'>  55</span>  def change_status(ticket_id):</span>
+<span class='hit'><span class='num'>  56</span>      return jsonify(ticket_service().change_status(g.current_user, ticket_id, json_body()))</span>
+<span class=''><span class='num'>  57</span>  </span>
+<span class=''><span class='num'>  58</span>  </span>
+<span class='hit'><span class='num'>  59</span>  @tickets_bp.patch(&quot;/&lt;int:ticket_id&gt;/assignee&quot;)</span>
+<span class='hit'><span class='num'>  60</span>  @login_required</span>
+<span class='hit'><span class='num'>  61</span>  def assign_ticket(ticket_id):</span>
+<span class='hit'><span class='num'>  62</span>      return jsonify(ticket_service().assign(g.current_user, ticket_id, json_body()))</span>
+<span class=''><span class='num'>  63</span>  </span>
+<span class=''><span class='num'>  64</span>  </span>
+<span class='hit'><span class='num'>  65</span>  @tickets_bp.get(&quot;/&lt;int:ticket_id&gt;/comments&quot;)</span>
+<span class='hit'><span class='num'>  66</span>  @login_required</span>
+<span class='hit'><span class='num'>  67</span>  def list_comments(ticket_id):</span>
+<span class='hit'><span class='num'>  68</span>      return jsonify(comment_service().list(ticket_id))</span>
+<span class=''><span class='num'>  69</span>  </span>
+<span class=''><span class='num'>  70</span>  </span>
+<span class='hit'><span class='num'>  71</span>  @tickets_bp.post(&quot;/&lt;int:ticket_id&gt;/comments&quot;)</span>
+<span class='hit'><span class='num'>  72</span>  @login_required</span>
+<span class='hit'><span class='num'>  73</span>  def add_comment(ticket_id):</span>
+<span class='hit'><span class='num'>  74</span>      comment = comment_service().add(g.current_user, ticket_id, json_body())</span>
+<span class='hit'><span class='num'>  75</span>      return jsonify(comment), 201</span>
+</pre>
+<h3 id='app/config.py'>app/config.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  import os</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class=''><span class='num'>   3</span>  </span>
+<span class='hit'><span class='num'>   4</span>  class Config:</span>
+<span class='hit'><span class='num'>   5</span>      DATABASE = os.environ.get(&quot;DATABASE&quot;, &quot;service_desk.db&quot;)</span>
+<span class='hit'><span class='num'>   6</span>      SECRET_KEY = os.environ.get(&quot;SECRET_KEY&quot;, &quot;dev-secret-key-change-me&quot;)</span>
+<span class='hit'><span class='num'>   7</span>      JWT_EXPIRES_MINUTES = int(os.environ.get(&quot;JWT_EXPIRES_MINUTES&quot;, &quot;60&quot;))</span>
+<span class='hit'><span class='num'>   8</span>      PASSWORD_ITERATIONS = 100_000</span>
+</pre>
+<h3 id='app/db.py'>app/db.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  import sqlite3</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class='hit'><span class='num'>   3</span>  from flask import current_app, g</span>
+<span class=''><span class='num'>   4</span>  </span>
+<span class=''><span class='num'>   5</span>  </span>
+<span class='hit'><span class='num'>   6</span>  def connect(path):</span>
+<span class='hit'><span class='num'>   7</span>      conn = sqlite3.connect(path)</span>
+<span class='hit'><span class='num'>   8</span>      conn.row_factory = sqlite3.Row</span>
+<span class='hit'><span class='num'>   9</span>      return conn</span>
+<span class=''><span class='num'>  10</span>  </span>
+<span class=''><span class='num'>  11</span>  </span>
+<span class='hit'><span class='num'>  12</span>  def get_db():</span>
+<span class='hit'><span class='num'>  13</span>      if &quot;db&quot; not in g:</span>
+<span class='hit'><span class='num'>  14</span>          g.db = connect(current_app.config[&quot;DATABASE&quot;])</span>
+<span class='hit'><span class='num'>  15</span>      return g.db</span>
+<span class=''><span class='num'>  16</span>  </span>
+<span class=''><span class='num'>  17</span>  </span>
+<span class='hit'><span class='num'>  18</span>  def close_db(exception=None):</span>
+<span class='hit'><span class='num'>  19</span>      db = g.pop(&quot;db&quot;, None)</span>
+<span class='hit'><span class='num'>  20</span>      if db is not None:</span>
+<span class='hit'><span class='num'>  21</span>          db.close()</span>
+</pre>
+<h3 id='app/errors.py'>app/errors.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  class AppError(Exception):</span>
+<span class='hit'><span class='num'>   2</span>      status_code = 500</span>
+<span class=''><span class='num'>   3</span>  </span>
+<span class='hit'><span class='num'>   4</span>      def __init__(self, message):</span>
+<span class='hit'><span class='num'>   5</span>          super().__init__(message)</span>
+<span class='hit'><span class='num'>   6</span>          self.message = message</span>
+<span class=''><span class='num'>   7</span>  </span>
+<span class=''><span class='num'>   8</span>  </span>
+<span class='hit'><span class='num'>   9</span>  class ValidationError(AppError):</span>
+<span class='hit'><span class='num'>  10</span>      status_code = 400</span>
+<span class=''><span class='num'>  11</span>  </span>
+<span class=''><span class='num'>  12</span>  </span>
+<span class='hit'><span class='num'>  13</span>  class AuthError(AppError):</span>
+<span class='hit'><span class='num'>  14</span>      status_code = 401</span>
+<span class=''><span class='num'>  15</span>  </span>
+<span class=''><span class='num'>  16</span>  </span>
+<span class='hit'><span class='num'>  17</span>  class ForbiddenError(AppError):</span>
+<span class='hit'><span class='num'>  18</span>      status_code = 403</span>
+<span class=''><span class='num'>  19</span>  </span>
+<span class=''><span class='num'>  20</span>  </span>
+<span class='hit'><span class='num'>  21</span>  class NotFoundError(AppError):</span>
+<span class='hit'><span class='num'>  22</span>      status_code = 404</span>
+<span class=''><span class='num'>  23</span>  </span>
+<span class=''><span class='num'>  24</span>  </span>
+<span class='hit'><span class='num'>  25</span>  class ConflictError(AppError):</span>
+<span class='hit'><span class='num'>  26</span>      status_code = 409</span>
+</pre>
+<h3 id='app/migrate.py'>app/migrate.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  &quot;&quot;&quot;Простой запуск SQL-миграций из каталога migrations/.</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class=''><span class='num'>   3</span>  Применённые миграции записываются в таблицу schema_migrations,</span>
+<span class=''><span class='num'>   4</span>  повторный запуск применяет только новые файлы.</span>
+<span class=''><span class='num'>   5</span>  Запуск: python -m app.migrate</span>
+<span class=''><span class='num'>   6</span>  &quot;&quot;&quot;</span>
+<span class='hit'><span class='num'>   7</span>  from pathlib import Path</span>
+<span class=''><span class='num'>   8</span>  </span>
+<span class='hit'><span class='num'>   9</span>  from app.config import Config</span>
+<span class='hit'><span class='num'>  10</span>  from app.db import connect</span>
+<span class='hit'><span class='num'>  11</span>  from app.models import utcnow_iso</span>
+<span class=''><span class='num'>  12</span>  </span>
+<span class='hit'><span class='num'>  13</span>  MIGRATIONS_DIR = Path(__file__).resolve().parent.parent / &quot;migrations&quot;</span>
+<span class=''><span class='num'>  14</span>  </span>
+<span class=''><span class='num'>  15</span>  </span>
+<span class='hit'><span class='num'>  16</span>  def run_migrations(conn, directory=MIGRATIONS_DIR):</span>
+<span class='hit'><span class='num'>  17</span>      conn.execute(</span>
+<span class='hit'><span class='num'>  18</span>          &quot;CREATE TABLE IF NOT EXISTS schema_migrations (&quot;</span>
+<span class=''><span class='num'>  19</span>          &quot;version TEXT PRIMARY KEY, applied_at TEXT NOT NULL)&quot;</span>
+<span class=''><span class='num'>  20</span>      )</span>
+<span class='hit'><span class='num'>  21</span>      applied = {row[0] for row in conn.execute(&quot;SELECT version FROM schema_migrations&quot;)}</span>
+<span class='hit'><span class='num'>  22</span>      done = []</span>
+<span class='hit'><span class='num'>  23</span>      for path in sorted(Path(directory).glob(&quot;*.sql&quot;)):</span>
+<span class='hit'><span class='num'>  24</span>          if path.name in applied:</span>
+<span class='hit'><span class='num'>  25</span>              continue</span>
+<span class='hit'><span class='num'>  26</span>          conn.executescript(path.read_text(encoding=&quot;utf-8&quot;))</span>
+<span class='hit'><span class='num'>  27</span>          conn.execute(</span>
+<span class='hit'><span class='num'>  28</span>              &quot;INSERT INTO schema_migrations (version, applied_at) VALUES (?, ?)&quot;,</span>
+<span class='hit'><span class='num'>  29</span>              (path.name, utcnow_iso()),</span>
+<span class=''><span class='num'>  30</span>          )</span>
+<span class='hit'><span class='num'>  31</span>          conn.commit()</span>
+<span class='hit'><span class='num'>  32</span>          done.append(path.name)</span>
+<span class='hit'><span class='num'>  33</span>      return done</span>
+<span class=''><span class='num'>  34</span>  </span>
+<span class=''><span class='num'>  35</span>  </span>
+<span class='hit'><span class='num'>  36</span>  if __name__ == &quot;__main__&quot;:</span>
+<span class='miss'><span class='num'>  37</span>      connection = connect(Config.DATABASE)</span>
+<span class='miss'><span class='num'>  38</span>      result = run_migrations(connection)</span>
+<span class='miss'><span class='num'>  39</span>      connection.close()</span>
+<span class='miss'><span class='num'>  40</span>      if result:</span>
+<span class='miss'><span class='num'>  41</span>          print(&quot;Применены миграции:&quot;, &quot;, &quot;.join(result))</span>
+<span class=''><span class='num'>  42</span>      else:</span>
+<span class='miss'><span class='num'>  43</span>          print(&quot;Новых миграций нет&quot;)</span>
+</pre>
+<h3 id='app/models.py'>app/models.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from datetime import datetime, timezone</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class='hit'><span class='num'>   3</span>  ROLE_USER = &quot;USER&quot;</span>
+<span class='hit'><span class='num'>   4</span>  ROLE_EXECUTOR = &quot;EXECUTOR&quot;</span>
+<span class='hit'><span class='num'>   5</span>  ROLE_ADMIN = &quot;ADMIN&quot;</span>
+<span class='hit'><span class='num'>   6</span>  ROLES = (ROLE_USER, ROLE_EXECUTOR, ROLE_ADMIN)</span>
+<span class=''><span class='num'>   7</span>  </span>
+<span class='hit'><span class='num'>   8</span>  PRIORITIES = (&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;)</span>
+<span class=''><span class='num'>   9</span>  </span>
+<span class='hit'><span class='num'>  10</span>  STATUS_NEW = &quot;NEW&quot;</span>
+<span class='hit'><span class='num'>  11</span>  STATUS_IN_PROGRESS = &quot;IN_PROGRESS&quot;</span>
+<span class='hit'><span class='num'>  12</span>  STATUS_RESOLVED = &quot;RESOLVED&quot;</span>
+<span class='hit'><span class='num'>  13</span>  STATUS_CLOSED = &quot;CLOSED&quot;</span>
+<span class='hit'><span class='num'>  14</span>  STATUSES = (STATUS_NEW, STATUS_IN_PROGRESS, STATUS_RESOLVED, STATUS_CLOSED)</span>
+<span class=''><span class='num'>  15</span>  </span>
+<span class=''><span class='num'>  16</span>  # Жизненный цикл заявки: NEW -&gt; IN_PROGRESS -&gt; RESOLVED -&gt; CLOSED</span>
+<span class='hit'><span class='num'>  17</span>  ALLOWED_TRANSITIONS = {</span>
+<span class='hit'><span class='num'>  18</span>      STATUS_NEW: {STATUS_IN_PROGRESS},</span>
+<span class='hit'><span class='num'>  19</span>      STATUS_IN_PROGRESS: {STATUS_RESOLVED},</span>
+<span class='hit'><span class='num'>  20</span>      STATUS_RESOLVED: {STATUS_CLOSED},</span>
+<span class='hit'><span class='num'>  21</span>      STATUS_CLOSED: set(),</span>
+<span class=''><span class='num'>  22</span>  }</span>
+<span class=''><span class='num'>  23</span>  </span>
+<span class=''><span class='num'>  24</span>  </span>
+<span class='hit'><span class='num'>  25</span>  def utcnow_iso():</span>
+<span class='hit'><span class='num'>  26</span>      return datetime.now(timezone.utc).isoformat(timespec=&quot;seconds&quot;)</span>
+</pre>
+<h3 id='app/openapi.py'>app/openapi.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  &quot;&quot;&quot;Описание API в формате OpenAPI 3.0 (отдаётся по /openapi.json, UI на /docs).&quot;&quot;&quot;</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class='hit'><span class='num'>   3</span>  STATUSES = [&quot;NEW&quot;, &quot;IN_PROGRESS&quot;, &quot;RESOLVED&quot;, &quot;CLOSED&quot;]</span>
+<span class='hit'><span class='num'>   4</span>  PRIORITIES = [&quot;LOW&quot;, &quot;MEDIUM&quot;, &quot;HIGH&quot;]</span>
+<span class='hit'><span class='num'>   5</span>  ROLES = [&quot;USER&quot;, &quot;EXECUTOR&quot;, &quot;ADMIN&quot;]</span>
+<span class=''><span class='num'>   6</span>  </span>
+<span class=''><span class='num'>   7</span>  </span>
+<span class='hit'><span class='num'>   8</span>  def _ref(name):</span>
+<span class='hit'><span class='num'>   9</span>      return {&quot;$ref&quot;: f&quot;#/components/schemas/{name}&quot;}</span>
+<span class=''><span class='num'>  10</span>  </span>
+<span class=''><span class='num'>  11</span>  </span>
+<span class='hit'><span class='num'>  12</span>  def _json(schema):</span>
+<span class='hit'><span class='num'>  13</span>      return {&quot;application/json&quot;: {&quot;schema&quot;: schema}}</span>
+<span class=''><span class='num'>  14</span>  </span>
+<span class=''><span class='num'>  15</span>  </span>
+<span class='hit'><span class='num'>  16</span>  def _resp(description, schema=None):</span>
+<span class='hit'><span class='num'>  17</span>      result = {&quot;description&quot;: description}</span>
+<span class='hit'><span class='num'>  18</span>      if schema is not None:</span>
+<span class='hit'><span class='num'>  19</span>          result[&quot;content&quot;] = _json(schema)</span>
+<span class='hit'><span class='num'>  20</span>      return result</span>
+<span class=''><span class='num'>  21</span>  </span>
+<span class=''><span class='num'>  22</span>  </span>
+<span class='hit'><span class='num'>  23</span>  ERRORS = {</span>
+<span class='hit'><span class='num'>  24</span>      &quot;400&quot;: _resp(&quot;Неверные данные&quot;, _ref(&quot;Error&quot;)),</span>
+<span class='hit'><span class='num'>  25</span>      &quot;401&quot;: _resp(&quot;Нет или неверный токен&quot;, _ref(&quot;Error&quot;)),</span>
+<span class='hit'><span class='num'>  26</span>      &quot;403&quot;: _resp(&quot;Недостаточно прав&quot;, _ref(&quot;Error&quot;)),</span>
+<span class='hit'><span class='num'>  27</span>      &quot;404&quot;: _resp(&quot;Не найдено&quot;, _ref(&quot;Error&quot;)),</span>
+<span class='hit'><span class='num'>  28</span>      &quot;409&quot;: _resp(&quot;Конфликт (например, недопустимый переход статуса)&quot;, _ref(&quot;Error&quot;)),</span>
+<span class=''><span class='num'>  29</span>  }</span>
+<span class=''><span class='num'>  30</span>  </span>
+<span class=''><span class='num'>  31</span>  </span>
+<span class='hit'><span class='num'>  32</span>  def _errors(*codes):</span>
+<span class='hit'><span class='num'>  33</span>      return {code: ERRORS[code] for code in codes}</span>
+<span class=''><span class='num'>  34</span>  </span>
+<span class=''><span class='num'>  35</span>  </span>
+<span class='hit'><span class='num'>  36</span>  ID_PARAM = {&quot;name&quot;: &quot;ticket_id&quot;, &quot;in&quot;: &quot;path&quot;, &quot;required&quot;: True, &quot;schema&quot;: {&quot;type&quot;: &quot;integer&quot;}}</span>
+<span class=''><span class='num'>  37</span>  </span>
+<span class=''><span class='num'>  38</span>  </span>
+<span class='hit'><span class='num'>  39</span>  def _query(name, schema):</span>
+<span class='hit'><span class='num'>  40</span>      return {&quot;name&quot;: name, &quot;in&quot;: &quot;query&quot;, &quot;required&quot;: False, &quot;schema&quot;: schema}</span>
+<span class=''><span class='num'>  41</span>  </span>
+<span class=''><span class='num'>  42</span>  </span>
+<span class='hit'><span class='num'>  43</span>  def build_spec():</span>
+<span class='hit'><span class='num'>  44</span>      secured = [{&quot;bearerAuth&quot;: []}]</span>
+<span class='hit'><span class='num'>  45</span>      return {</span>
+<span class='hit'><span class='num'>  46</span>          &quot;openapi&quot;: &quot;3.0.3&quot;,</span>
+<span class='hit'><span class='num'>  47</span>          &quot;info&quot;: {</span>
+<span class='hit'><span class='num'>  48</span>              &quot;title&quot;: &quot;Сервис заявок&quot;,</span>
+<span class='hit'><span class='num'>  49</span>              &quot;version&quot;: &quot;1.0.0&quot;,</span>
+<span class='hit'><span class='num'>  50</span>              &quot;description&quot;: &quot;REST API учёта заявок (Service Desk)&quot;,</span>
+<span class=''><span class='num'>  51</span>          },</span>
+<span class='hit'><span class='num'>  52</span>          &quot;components&quot;: {</span>
+<span class='hit'><span class='num'>  53</span>              &quot;securitySchemes&quot;: {</span>
+<span class='hit'><span class='num'>  54</span>                  &quot;bearerAuth&quot;: {&quot;type&quot;: &quot;http&quot;, &quot;scheme&quot;: &quot;bearer&quot;, &quot;bearerFormat&quot;: &quot;JWT&quot;}</span>
+<span class=''><span class='num'>  55</span>              },</span>
+<span class='hit'><span class='num'>  56</span>              &quot;schemas&quot;: {</span>
+<span class='hit'><span class='num'>  57</span>                  &quot;Error&quot;: {&quot;type&quot;: &quot;object&quot;, &quot;properties&quot;: {&quot;error&quot;: {&quot;type&quot;: &quot;string&quot;}}},</span>
+<span class='hit'><span class='num'>  58</span>                  &quot;RegisterRequest&quot;: {</span>
+<span class='hit'><span class='num'>  59</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'>  60</span>                      &quot;required&quot;: [&quot;username&quot;, &quot;password&quot;],</span>
+<span class='hit'><span class='num'>  61</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'>  62</span>                          &quot;username&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'>  63</span>                          &quot;password&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'>  64</span>                          &quot;role&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: ROLES},</span>
+<span class=''><span class='num'>  65</span>                      },</span>
+<span class=''><span class='num'>  66</span>                  },</span>
+<span class='hit'><span class='num'>  67</span>                  &quot;LoginRequest&quot;: {</span>
+<span class='hit'><span class='num'>  68</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'>  69</span>                      &quot;required&quot;: [&quot;username&quot;, &quot;password&quot;],</span>
+<span class='hit'><span class='num'>  70</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'>  71</span>                          &quot;username&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'>  72</span>                          &quot;password&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class=''><span class='num'>  73</span>                      },</span>
+<span class=''><span class='num'>  74</span>                  },</span>
+<span class='hit'><span class='num'>  75</span>                  &quot;Token&quot;: {</span>
+<span class='hit'><span class='num'>  76</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'>  77</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'>  78</span>                          &quot;access_token&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'>  79</span>                          &quot;token_type&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class=''><span class='num'>  80</span>                      },</span>
+<span class=''><span class='num'>  81</span>                  },</span>
+<span class='hit'><span class='num'>  82</span>                  &quot;User&quot;: {</span>
+<span class='hit'><span class='num'>  83</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'>  84</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'>  85</span>                          &quot;id&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'>  86</span>                          &quot;username&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'>  87</span>                          &quot;role&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: ROLES},</span>
+<span class='hit'><span class='num'>  88</span>                          &quot;created_at&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class=''><span class='num'>  89</span>                      },</span>
+<span class=''><span class='num'>  90</span>                  },</span>
+<span class='hit'><span class='num'>  91</span>                  &quot;Ticket&quot;: {</span>
+<span class='hit'><span class='num'>  92</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'>  93</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'>  94</span>                          &quot;id&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'>  95</span>                          &quot;subject&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'>  96</span>                          &quot;description&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'>  97</span>                          &quot;priority&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: PRIORITIES},</span>
+<span class='hit'><span class='num'>  98</span>                          &quot;status&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: STATUSES},</span>
+<span class='hit'><span class='num'>  99</span>                          &quot;author_id&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'> 100</span>                          &quot;assignee_id&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;nullable&quot;: True},</span>
+<span class='hit'><span class='num'> 101</span>                          &quot;created_at&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'> 102</span>                          &quot;updated_at&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class=''><span class='num'> 103</span>                      },</span>
+<span class=''><span class='num'> 104</span>                  },</span>
+<span class='hit'><span class='num'> 105</span>                  &quot;TicketCreate&quot;: {</span>
+<span class='hit'><span class='num'> 106</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'> 107</span>                      &quot;required&quot;: [&quot;subject&quot;, &quot;description&quot;],</span>
+<span class='hit'><span class='num'> 108</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'> 109</span>                          &quot;subject&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'> 110</span>                          &quot;description&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'> 111</span>                          &quot;priority&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: PRIORITIES},</span>
+<span class='hit'><span class='num'> 112</span>                          &quot;assignee_id&quot;: {&quot;type&quot;: &quot;integer&quot;, &quot;nullable&quot;: True},</span>
+<span class=''><span class='num'> 113</span>                      },</span>
+<span class=''><span class='num'> 114</span>                  },</span>
+<span class='hit'><span class='num'> 115</span>                  &quot;TicketUpdate&quot;: {</span>
+<span class='hit'><span class='num'> 116</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'> 117</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'> 118</span>                          &quot;subject&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'> 119</span>                          &quot;description&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'> 120</span>                          &quot;priority&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: PRIORITIES},</span>
+<span class=''><span class='num'> 121</span>                      },</span>
+<span class=''><span class='num'> 122</span>                  },</span>
+<span class='hit'><span class='num'> 123</span>                  &quot;TicketPage&quot;: {</span>
+<span class='hit'><span class='num'> 124</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'> 125</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'> 126</span>                          &quot;items&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;items&quot;: _ref(&quot;Ticket&quot;)},</span>
+<span class='hit'><span class='num'> 127</span>                          &quot;total&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'> 128</span>                          &quot;page&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'> 129</span>                          &quot;page_size&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class=''><span class='num'> 130</span>                      },</span>
+<span class=''><span class='num'> 131</span>                  },</span>
+<span class='hit'><span class='num'> 132</span>                  &quot;StatusChange&quot;: {</span>
+<span class='hit'><span class='num'> 133</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'> 134</span>                      &quot;required&quot;: [&quot;status&quot;],</span>
+<span class='hit'><span class='num'> 135</span>                      &quot;properties&quot;: {&quot;status&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: STATUSES}},</span>
+<span class=''><span class='num'> 136</span>                  },</span>
+<span class='hit'><span class='num'> 137</span>                  &quot;AssigneeChange&quot;: {</span>
+<span class='hit'><span class='num'> 138</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'> 139</span>                      &quot;required&quot;: [&quot;assignee_id&quot;],</span>
+<span class='hit'><span class='num'> 140</span>                      &quot;properties&quot;: {&quot;assignee_id&quot;: {&quot;type&quot;: &quot;integer&quot;}},</span>
+<span class=''><span class='num'> 141</span>                  },</span>
+<span class='hit'><span class='num'> 142</span>                  &quot;Comment&quot;: {</span>
+<span class='hit'><span class='num'> 143</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'> 144</span>                      &quot;properties&quot;: {</span>
+<span class='hit'><span class='num'> 145</span>                          &quot;id&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'> 146</span>                          &quot;ticket_id&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'> 147</span>                          &quot;author_id&quot;: {&quot;type&quot;: &quot;integer&quot;},</span>
+<span class='hit'><span class='num'> 148</span>                          &quot;text&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class='hit'><span class='num'> 149</span>                          &quot;created_at&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class=''><span class='num'> 150</span>                      },</span>
+<span class=''><span class='num'> 151</span>                  },</span>
+<span class='hit'><span class='num'> 152</span>                  &quot;CommentCreate&quot;: {</span>
+<span class='hit'><span class='num'> 153</span>                      &quot;type&quot;: &quot;object&quot;,</span>
+<span class='hit'><span class='num'> 154</span>                      &quot;required&quot;: [&quot;text&quot;],</span>
+<span class='hit'><span class='num'> 155</span>                      &quot;properties&quot;: {&quot;text&quot;: {&quot;type&quot;: &quot;string&quot;}},</span>
+<span class=''><span class='num'> 156</span>                  },</span>
+<span class=''><span class='num'> 157</span>              },</span>
+<span class=''><span class='num'> 158</span>          },</span>
+<span class='hit'><span class='num'> 159</span>          &quot;paths&quot;: {</span>
+<span class='hit'><span class='num'> 160</span>              &quot;/auth/register&quot;: {</span>
+<span class='hit'><span class='num'> 161</span>                  &quot;post&quot;: {</span>
+<span class='hit'><span class='num'> 162</span>                      &quot;tags&quot;: [&quot;auth&quot;],</span>
+<span class='hit'><span class='num'> 163</span>                      &quot;summary&quot;: &quot;Регистрация пользователя&quot;,</span>
+<span class='hit'><span class='num'> 164</span>                      &quot;requestBody&quot;: {&quot;required&quot;: True, &quot;content&quot;: _json(_ref(&quot;RegisterRequest&quot;))},</span>
+<span class='hit'><span class='num'> 165</span>                      &quot;responses&quot;: {&quot;201&quot;: _resp(&quot;Пользователь создан&quot;, _ref(&quot;User&quot;)),</span>
+<span class='hit'><span class='num'> 166</span>                                    **_errors(&quot;400&quot;, &quot;409&quot;)},</span>
+<span class=''><span class='num'> 167</span>                  }</span>
+<span class=''><span class='num'> 168</span>              },</span>
+<span class='hit'><span class='num'> 169</span>              &quot;/auth/login&quot;: {</span>
+<span class='hit'><span class='num'> 170</span>                  &quot;post&quot;: {</span>
+<span class='hit'><span class='num'> 171</span>                      &quot;tags&quot;: [&quot;auth&quot;],</span>
+<span class='hit'><span class='num'> 172</span>                      &quot;summary&quot;: &quot;Вход, выдача JWT-токена&quot;,</span>
+<span class='hit'><span class='num'> 173</span>                      &quot;requestBody&quot;: {&quot;required&quot;: True, &quot;content&quot;: _json(_ref(&quot;LoginRequest&quot;))},</span>
+<span class='hit'><span class='num'> 174</span>                      &quot;responses&quot;: {&quot;200&quot;: _resp(&quot;JWT-токен&quot;, _ref(&quot;Token&quot;)),</span>
+<span class='hit'><span class='num'> 175</span>                                    **_errors(&quot;400&quot;, &quot;401&quot;)},</span>
+<span class=''><span class='num'> 176</span>                  }</span>
+<span class=''><span class='num'> 177</span>              },</span>
+<span class='hit'><span class='num'> 178</span>              &quot;/tickets&quot;: {</span>
+<span class='hit'><span class='num'> 179</span>                  &quot;get&quot;: {</span>
+<span class='hit'><span class='num'> 180</span>                      &quot;tags&quot;: [&quot;tickets&quot;],</span>
+<span class='hit'><span class='num'> 181</span>                      &quot;summary&quot;: &quot;Список заявок с фильтрами и постраничной навигацией&quot;,</span>
+<span class='hit'><span class='num'> 182</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 183</span>                      &quot;parameters&quot;: [</span>
+<span class='hit'><span class='num'> 184</span>                          _query(&quot;status&quot;, {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: STATUSES}),</span>
+<span class='hit'><span class='num'> 185</span>                          _query(&quot;priority&quot;, {&quot;type&quot;: &quot;string&quot;, &quot;enum&quot;: PRIORITIES}),</span>
+<span class='hit'><span class='num'> 186</span>                          _query(&quot;assignee_id&quot;, {&quot;type&quot;: &quot;integer&quot;}),</span>
+<span class='hit'><span class='num'> 187</span>                          _query(&quot;page&quot;, {&quot;type&quot;: &quot;integer&quot;, &quot;default&quot;: 1}),</span>
+<span class='hit'><span class='num'> 188</span>                          _query(&quot;page_size&quot;, {&quot;type&quot;: &quot;integer&quot;, &quot;default&quot;: 10}),</span>
+<span class=''><span class='num'> 189</span>                      ],</span>
+<span class='hit'><span class='num'> 190</span>                      &quot;responses&quot;: {&quot;200&quot;: _resp(&quot;Страница заявок&quot;, _ref(&quot;TicketPage&quot;)),</span>
+<span class='hit'><span class='num'> 191</span>                                    **_errors(&quot;400&quot;, &quot;401&quot;)},</span>
+<span class=''><span class='num'> 192</span>                  },</span>
+<span class='hit'><span class='num'> 193</span>                  &quot;post&quot;: {</span>
+<span class='hit'><span class='num'> 194</span>                      &quot;tags&quot;: [&quot;tickets&quot;],</span>
+<span class='hit'><span class='num'> 195</span>                      &quot;summary&quot;: &quot;Создание заявки&quot;,</span>
+<span class='hit'><span class='num'> 196</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 197</span>                      &quot;requestBody&quot;: {&quot;required&quot;: True, &quot;content&quot;: _json(_ref(&quot;TicketCreate&quot;))},</span>
+<span class='hit'><span class='num'> 198</span>                      &quot;responses&quot;: {&quot;201&quot;: _resp(&quot;Заявка создана&quot;, _ref(&quot;Ticket&quot;)),</span>
+<span class='hit'><span class='num'> 199</span>                                    **_errors(&quot;400&quot;, &quot;401&quot;)},</span>
+<span class=''><span class='num'> 200</span>                  },</span>
+<span class=''><span class='num'> 201</span>              },</span>
+<span class='hit'><span class='num'> 202</span>              &quot;/tickets/{ticket_id}&quot;: {</span>
+<span class='hit'><span class='num'> 203</span>                  &quot;parameters&quot;: [ID_PARAM],</span>
+<span class='hit'><span class='num'> 204</span>                  &quot;get&quot;: {</span>
+<span class='hit'><span class='num'> 205</span>                      &quot;tags&quot;: [&quot;tickets&quot;],</span>
+<span class='hit'><span class='num'> 206</span>                      &quot;summary&quot;: &quot;Заявка по идентификатору&quot;,</span>
+<span class='hit'><span class='num'> 207</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 208</span>                      &quot;responses&quot;: {&quot;200&quot;: _resp(&quot;Заявка&quot;, _ref(&quot;Ticket&quot;)),</span>
+<span class='hit'><span class='num'> 209</span>                                    **_errors(&quot;401&quot;, &quot;404&quot;)},</span>
+<span class=''><span class='num'> 210</span>                  },</span>
+<span class='hit'><span class='num'> 211</span>                  &quot;put&quot;: {</span>
+<span class='hit'><span class='num'> 212</span>                      &quot;tags&quot;: [&quot;tickets&quot;],</span>
+<span class='hit'><span class='num'> 213</span>                      &quot;summary&quot;: &quot;Редактирование заявки&quot;,</span>
+<span class='hit'><span class='num'> 214</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 215</span>                      &quot;requestBody&quot;: {&quot;required&quot;: True, &quot;content&quot;: _json(_ref(&quot;TicketUpdate&quot;))},</span>
+<span class='hit'><span class='num'> 216</span>                      &quot;responses&quot;: {&quot;200&quot;: _resp(&quot;Заявка обновлена&quot;, _ref(&quot;Ticket&quot;)),</span>
+<span class='hit'><span class='num'> 217</span>                                    **_errors(&quot;400&quot;, &quot;401&quot;, &quot;403&quot;, &quot;404&quot;)},</span>
+<span class=''><span class='num'> 218</span>                  },</span>
+<span class='hit'><span class='num'> 219</span>                  &quot;delete&quot;: {</span>
+<span class='hit'><span class='num'> 220</span>                      &quot;tags&quot;: [&quot;tickets&quot;],</span>
+<span class='hit'><span class='num'> 221</span>                      &quot;summary&quot;: &quot;Мягкое удаление заявки (только ADMIN)&quot;,</span>
+<span class='hit'><span class='num'> 222</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 223</span>                      &quot;responses&quot;: {&quot;204&quot;: _resp(&quot;Заявка удалена&quot;),</span>
+<span class='hit'><span class='num'> 224</span>                                    **_errors(&quot;401&quot;, &quot;403&quot;, &quot;404&quot;)},</span>
+<span class=''><span class='num'> 225</span>                  },</span>
+<span class=''><span class='num'> 226</span>              },</span>
+<span class='hit'><span class='num'> 227</span>              &quot;/tickets/{ticket_id}/status&quot;: {</span>
+<span class='hit'><span class='num'> 228</span>                  &quot;parameters&quot;: [ID_PARAM],</span>
+<span class='hit'><span class='num'> 229</span>                  &quot;patch&quot;: {</span>
+<span class='hit'><span class='num'> 230</span>                      &quot;tags&quot;: [&quot;tickets&quot;],</span>
+<span class='hit'><span class='num'> 231</span>                      &quot;summary&quot;: &quot;Смена статуса заявки&quot;,</span>
+<span class='hit'><span class='num'> 232</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 233</span>                      &quot;requestBody&quot;: {&quot;required&quot;: True, &quot;content&quot;: _json(_ref(&quot;StatusChange&quot;))},</span>
+<span class='hit'><span class='num'> 234</span>                      &quot;responses&quot;: {&quot;200&quot;: _resp(&quot;Статус изменён&quot;, _ref(&quot;Ticket&quot;)),</span>
+<span class='hit'><span class='num'> 235</span>                                    **_errors(&quot;400&quot;, &quot;401&quot;, &quot;403&quot;, &quot;404&quot;, &quot;409&quot;)},</span>
+<span class=''><span class='num'> 236</span>                  },</span>
+<span class=''><span class='num'> 237</span>              },</span>
+<span class='hit'><span class='num'> 238</span>              &quot;/tickets/{ticket_id}/assignee&quot;: {</span>
+<span class='hit'><span class='num'> 239</span>                  &quot;parameters&quot;: [ID_PARAM],</span>
+<span class='hit'><span class='num'> 240</span>                  &quot;patch&quot;: {</span>
+<span class='hit'><span class='num'> 241</span>                      &quot;tags&quot;: [&quot;tickets&quot;],</span>
+<span class='hit'><span class='num'> 242</span>                      &quot;summary&quot;: &quot;Назначение исполнителя (только ADMIN)&quot;,</span>
+<span class='hit'><span class='num'> 243</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 244</span>                      &quot;requestBody&quot;: {&quot;required&quot;: True, &quot;content&quot;: _json(_ref(&quot;AssigneeChange&quot;))},</span>
+<span class='hit'><span class='num'> 245</span>                      &quot;responses&quot;: {&quot;200&quot;: _resp(&quot;Исполнитель назначен&quot;, _ref(&quot;Ticket&quot;)),</span>
+<span class='hit'><span class='num'> 246</span>                                    **_errors(&quot;400&quot;, &quot;401&quot;, &quot;403&quot;, &quot;404&quot;)},</span>
+<span class=''><span class='num'> 247</span>                  },</span>
+<span class=''><span class='num'> 248</span>              },</span>
+<span class='hit'><span class='num'> 249</span>              &quot;/tickets/{ticket_id}/comments&quot;: {</span>
+<span class='hit'><span class='num'> 250</span>                  &quot;parameters&quot;: [ID_PARAM],</span>
+<span class='hit'><span class='num'> 251</span>                  &quot;get&quot;: {</span>
+<span class='hit'><span class='num'> 252</span>                      &quot;tags&quot;: [&quot;comments&quot;],</span>
+<span class='hit'><span class='num'> 253</span>                      &quot;summary&quot;: &quot;Список комментариев заявки&quot;,</span>
+<span class='hit'><span class='num'> 254</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 255</span>                      &quot;responses&quot;: {</span>
+<span class='hit'><span class='num'> 256</span>                          &quot;200&quot;: _resp(&quot;Комментарии&quot;,</span>
+<span class='hit'><span class='num'> 257</span>                                       {&quot;type&quot;: &quot;array&quot;, &quot;items&quot;: _ref(&quot;Comment&quot;)}),</span>
+<span class='hit'><span class='num'> 258</span>                          **_errors(&quot;401&quot;, &quot;404&quot;),</span>
+<span class=''><span class='num'> 259</span>                      },</span>
+<span class=''><span class='num'> 260</span>                  },</span>
+<span class='hit'><span class='num'> 261</span>                  &quot;post&quot;: {</span>
+<span class='hit'><span class='num'> 262</span>                      &quot;tags&quot;: [&quot;comments&quot;],</span>
+<span class='hit'><span class='num'> 263</span>                      &quot;summary&quot;: &quot;Добавление комментария&quot;,</span>
+<span class='hit'><span class='num'> 264</span>                      &quot;security&quot;: secured,</span>
+<span class='hit'><span class='num'> 265</span>                      &quot;requestBody&quot;: {&quot;required&quot;: True, &quot;content&quot;: _json(_ref(&quot;CommentCreate&quot;))},</span>
+<span class='hit'><span class='num'> 266</span>                      &quot;responses&quot;: {&quot;201&quot;: _resp(&quot;Комментарий добавлен&quot;, _ref(&quot;Comment&quot;)),</span>
+<span class='hit'><span class='num'> 267</span>                                    **_errors(&quot;400&quot;, &quot;401&quot;, &quot;404&quot;)},</span>
+<span class=''><span class='num'> 268</span>                  },</span>
+<span class=''><span class='num'> 269</span>              },</span>
+<span class=''><span class='num'> 270</span>          },</span>
+<span class=''><span class='num'> 271</span>      }</span>
+</pre>
+<h3 id='app/repositories/__init__.py'>app/repositories/__init__.py</h3><pre>
+</pre>
+<h3 id='app/repositories/comments.py'>app/repositories/comments.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  class CommentRepository:</span>
+<span class='hit'><span class='num'>   2</span>      def __init__(self, conn):</span>
+<span class='hit'><span class='num'>   3</span>          self.conn = conn</span>
+<span class=''><span class='num'>   4</span>  </span>
+<span class='hit'><span class='num'>   5</span>      def create(self, ticket_id, author_id, text, now):</span>
+<span class='hit'><span class='num'>   6</span>          cur = self.conn.execute(</span>
+<span class='hit'><span class='num'>   7</span>              &quot;INSERT INTO comments (ticket_id, author_id, text, created_at) &quot;</span>
+<span class=''><span class='num'>   8</span>              &quot;VALUES (?, ?, ?, ?)&quot;,</span>
+<span class='hit'><span class='num'>   9</span>              (ticket_id, author_id, text, now),</span>
+<span class=''><span class='num'>  10</span>          )</span>
+<span class='hit'><span class='num'>  11</span>          self.conn.commit()</span>
+<span class='hit'><span class='num'>  12</span>          row = self.conn.execute(</span>
+<span class='hit'><span class='num'>  13</span>              &quot;SELECT * FROM comments WHERE id = ?&quot;, (cur.lastrowid,)</span>
+<span class='hit'><span class='num'>  14</span>          ).fetchone()</span>
+<span class='hit'><span class='num'>  15</span>          return dict(row)</span>
+<span class=''><span class='num'>  16</span>  </span>
+<span class='hit'><span class='num'>  17</span>      def list_by_ticket(self, ticket_id):</span>
+<span class='hit'><span class='num'>  18</span>          rows = self.conn.execute(</span>
+<span class='hit'><span class='num'>  19</span>              &quot;SELECT * FROM comments WHERE ticket_id = ? ORDER BY id&quot;, (ticket_id,)</span>
+<span class='hit'><span class='num'>  20</span>          ).fetchall()</span>
+<span class='hit'><span class='num'>  21</span>          return [dict(r) for r in rows]</span>
+</pre>
+<h3 id='app/repositories/tickets.py'>app/repositories/tickets.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  UPDATABLE_FIELDS = (&quot;subject&quot;, &quot;description&quot;, &quot;priority&quot;, &quot;status&quot;)</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class=''><span class='num'>   3</span>  </span>
+<span class='hit'><span class='num'>   4</span>  def _build_where(status, priority, assignee_id):</span>
+<span class='hit'><span class='num'>   5</span>      clauses = []</span>
+<span class='hit'><span class='num'>   6</span>      params = []</span>
+<span class='hit'><span class='num'>   7</span>      if status is not None:</span>
+<span class='hit'><span class='num'>   8</span>          clauses.append(&quot;status = ?&quot;)</span>
+<span class='hit'><span class='num'>   9</span>          params.append(status)</span>
+<span class='hit'><span class='num'>  10</span>      if priority is not None:</span>
+<span class='hit'><span class='num'>  11</span>          clauses.append(&quot;priority = ?&quot;)</span>
+<span class='hit'><span class='num'>  12</span>          params.append(priority)</span>
+<span class='hit'><span class='num'>  13</span>      if assignee_id is not None:</span>
+<span class='hit'><span class='num'>  14</span>          clauses.append(&quot;assignee_id = ?&quot;)</span>
+<span class='hit'><span class='num'>  15</span>          params.append(assignee_id)</span>
+<span class='hit'><span class='num'>  16</span>      return clauses, params</span>
+<span class=''><span class='num'>  17</span>  </span>
+<span class=''><span class='num'>  18</span>  </span>
+<span class='hit'><span class='num'>  19</span>  class TicketRepository:</span>
+<span class='hit'><span class='num'>  20</span>      def __init__(self, conn):</span>
+<span class='hit'><span class='num'>  21</span>          self.conn = conn</span>
+<span class=''><span class='num'>  22</span>  </span>
+<span class='hit'><span class='num'>  23</span>      def create(self, subject, description, priority, author_id, assignee_id, now):</span>
+<span class='hit'><span class='num'>  24</span>          cur = self.conn.execute(</span>
+<span class='hit'><span class='num'>  25</span>              &quot;INSERT INTO tickets (subject, description, priority, status, author_id, &quot;</span>
+<span class=''><span class='num'>  26</span>              &quot;assignee_id, is_deleted, created_at, updated_at) &quot;</span>
+<span class=''><span class='num'>  27</span>              &quot;VALUES (?, ?, ?, &#x27;NEW&#x27;, ?, ?, 0, ?, ?)&quot;,</span>
+<span class='hit'><span class='num'>  28</span>              (subject, description, priority, author_id, assignee_id, now, now),</span>
+<span class=''><span class='num'>  29</span>          )</span>
+<span class='hit'><span class='num'>  30</span>          self.conn.commit()</span>
+<span class='hit'><span class='num'>  31</span>          return cur.lastrowid</span>
+<span class=''><span class='num'>  32</span>  </span>
+<span class='hit'><span class='num'>  33</span>      def get(self, ticket_id):</span>
+<span class='hit'><span class='num'>  34</span>          row = self.conn.execute(</span>
+<span class='hit'><span class='num'>  35</span>              &quot;SELECT * FROM tickets WHERE id = ?&quot;, (ticket_id,)</span>
+<span class='hit'><span class='num'>  36</span>          ).fetchone()</span>
+<span class='hit'><span class='num'>  37</span>          return dict(row) if row else None</span>
+<span class=''><span class='num'>  38</span>  </span>
+<span class='hit'><span class='num'>  39</span>      def list(self, status=None, priority=None, assignee_id=None, limit=10, offset=0):</span>
+<span class='hit'><span class='num'>  40</span>          clauses, params = _build_where(status, priority, assignee_id)</span>
+<span class='hit'><span class='num'>  41</span>          clauses.append(&quot;is_deleted = 0&quot;)</span>
+<span class='hit'><span class='num'>  42</span>          sql = (</span>
+<span class='hit'><span class='num'>  43</span>              &quot;SELECT * FROM tickets WHERE &quot; + &quot; AND &quot;.join(clauses)</span>
+<span class='hit'><span class='num'>  44</span>              + &quot; ORDER BY id DESC LIMIT ? OFFSET ?&quot;</span>
+<span class=''><span class='num'>  45</span>          )</span>
+<span class='hit'><span class='num'>  46</span>          rows = self.conn.execute(sql, params + [limit, offset]).fetchall()</span>
+<span class='hit'><span class='num'>  47</span>          return [dict(r) for r in rows]</span>
+<span class=''><span class='num'>  48</span>  </span>
+<span class='hit'><span class='num'>  49</span>      def count(self, status=None, priority=None, assignee_id=None):</span>
+<span class='hit'><span class='num'>  50</span>          clauses, params = _build_where(status, priority, assignee_id)</span>
+<span class='hit'><span class='num'>  51</span>          sql = &quot;SELECT COUNT(*) FROM tickets&quot;</span>
+<span class='hit'><span class='num'>  52</span>          if clauses:</span>
+<span class='hit'><span class='num'>  53</span>              sql += &quot; WHERE &quot; + &quot; AND &quot;.join(clauses)</span>
+<span class='hit'><span class='num'>  54</span>          return self.conn.execute(sql, params).fetchone()[0]</span>
+<span class=''><span class='num'>  55</span>  </span>
+<span class='hit'><span class='num'>  56</span>      def update(self, ticket_id, fields, now):</span>
+<span class='hit'><span class='num'>  57</span>          names = [name for name in UPDATABLE_FIELDS if name in fields]</span>
+<span class='hit'><span class='num'>  58</span>          assignments = &quot;, &quot;.join(f&quot;{name} = ?&quot; for name in names)</span>
+<span class='hit'><span class='num'>  59</span>          values = [fields[name] for name in names]</span>
+<span class='hit'><span class='num'>  60</span>          self.conn.execute(</span>
+<span class='hit'><span class='num'>  61</span>              f&quot;UPDATE tickets SET {assignments}, updated_at = ? WHERE id = ?&quot;,</span>
+<span class='hit'><span class='num'>  62</span>              values + [now, ticket_id],</span>
+<span class=''><span class='num'>  63</span>          )</span>
+<span class='hit'><span class='num'>  64</span>          self.conn.commit()</span>
+<span class=''><span class='num'>  65</span>  </span>
+<span class='hit'><span class='num'>  66</span>      def set_status(self, ticket_id, status):</span>
+<span class='hit'><span class='num'>  67</span>          self.conn.execute(</span>
+<span class='hit'><span class='num'>  68</span>              &quot;UPDATE tickets SET status = ? WHERE id = ?&quot;, (status, ticket_id)</span>
+<span class=''><span class='num'>  69</span>          )</span>
+<span class='hit'><span class='num'>  70</span>          self.conn.commit()</span>
+<span class=''><span class='num'>  71</span>  </span>
+<span class='hit'><span class='num'>  72</span>      def set_assignee(self, ticket_id, assignee_id, now):</span>
+<span class='hit'><span class='num'>  73</span>          self.conn.execute(</span>
+<span class='hit'><span class='num'>  74</span>              &quot;UPDATE tickets SET assignee_id = ?, updated_at = ? WHERE id = ?&quot;,</span>
+<span class='hit'><span class='num'>  75</span>              (assignee_id, now, ticket_id),</span>
+<span class=''><span class='num'>  76</span>          )</span>
+<span class='hit'><span class='num'>  77</span>          self.conn.commit()</span>
+<span class=''><span class='num'>  78</span>  </span>
+<span class='hit'><span class='num'>  79</span>      def soft_delete(self, ticket_id, now):</span>
+<span class='hit'><span class='num'>  80</span>          self.conn.execute(</span>
+<span class='hit'><span class='num'>  81</span>              &quot;UPDATE tickets SET is_deleted = 1, updated_at = ? WHERE id = ?&quot;,</span>
+<span class='hit'><span class='num'>  82</span>              (now, ticket_id),</span>
+<span class=''><span class='num'>  83</span>          )</span>
+<span class='hit'><span class='num'>  84</span>          self.conn.commit()</span>
+</pre>
+<h3 id='app/repositories/users.py'>app/repositories/users.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  class UserRepository:</span>
+<span class='hit'><span class='num'>   2</span>      def __init__(self, conn):</span>
+<span class='hit'><span class='num'>   3</span>          self.conn = conn</span>
+<span class=''><span class='num'>   4</span>  </span>
+<span class='hit'><span class='num'>   5</span>      def create(self, username, password_hash, role, created_at):</span>
+<span class='hit'><span class='num'>   6</span>          cur = self.conn.execute(</span>
+<span class='hit'><span class='num'>   7</span>              &quot;INSERT INTO users (username, password_hash, role, created_at) &quot;</span>
+<span class=''><span class='num'>   8</span>              &quot;VALUES (?, ?, ?, ?)&quot;,</span>
+<span class='hit'><span class='num'>   9</span>              (username, password_hash, role, created_at),</span>
+<span class=''><span class='num'>  10</span>          )</span>
+<span class='hit'><span class='num'>  11</span>          self.conn.commit()</span>
+<span class='hit'><span class='num'>  12</span>          return self.get_by_id(cur.lastrowid)</span>
+<span class=''><span class='num'>  13</span>  </span>
+<span class='hit'><span class='num'>  14</span>      def get_by_id(self, user_id):</span>
+<span class='hit'><span class='num'>  15</span>          row = self.conn.execute(</span>
+<span class='hit'><span class='num'>  16</span>              &quot;SELECT * FROM users WHERE id = ?&quot;, (user_id,)</span>
+<span class='hit'><span class='num'>  17</span>          ).fetchone()</span>
+<span class='hit'><span class='num'>  18</span>          return dict(row) if row else None</span>
+<span class=''><span class='num'>  19</span>  </span>
+<span class='hit'><span class='num'>  20</span>      def get_by_username(self, username):</span>
+<span class='hit'><span class='num'>  21</span>          row = self.conn.execute(</span>
+<span class='hit'><span class='num'>  22</span>              &quot;SELECT * FROM users WHERE username = ?&quot;, (username,)</span>
+<span class='hit'><span class='num'>  23</span>          ).fetchone()</span>
+<span class='hit'><span class='num'>  24</span>          return dict(row) if row else None</span>
+</pre>
+<h3 id='app/security.py'>app/security.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  import hashlib</span>
+<span class='hit'><span class='num'>   2</span>  import hmac</span>
+<span class='hit'><span class='num'>   3</span>  import os</span>
+<span class='hit'><span class='num'>   4</span>  from datetime import datetime, timedelta</span>
+<span class=''><span class='num'>   5</span>  </span>
+<span class='hit'><span class='num'>   6</span>  import jwt</span>
+<span class=''><span class='num'>   7</span>  </span>
+<span class=''><span class='num'>   8</span>  </span>
+<span class='hit'><span class='num'>   9</span>  def hash_password(password, iterations):</span>
+<span class='hit'><span class='num'>  10</span>      salt = os.urandom(16)</span>
+<span class='hit'><span class='num'>  11</span>      digest = hashlib.pbkdf2_hmac(&quot;sha256&quot;, password.encode(&quot;utf-8&quot;), salt, iterations)</span>
+<span class='hit'><span class='num'>  12</span>      return f&quot;{iterations}${salt.hex()}${digest.hex()}&quot;</span>
+<span class=''><span class='num'>  13</span>  </span>
+<span class=''><span class='num'>  14</span>  </span>
+<span class='hit'><span class='num'>  15</span>  def verify_password(password, stored):</span>
+<span class='hit'><span class='num'>  16</span>      try:</span>
+<span class='hit'><span class='num'>  17</span>          iterations, salt_hex, digest_hex = stored.split(&quot;$&quot;)</span>
+<span class='hit'><span class='num'>  18</span>          digest = hashlib.pbkdf2_hmac(</span>
+<span class='hit'><span class='num'>  19</span>              &quot;sha256&quot;, password.encode(&quot;utf-8&quot;), bytes.fromhex(salt_hex), int(iterations)</span>
+<span class=''><span class='num'>  20</span>          )</span>
+<span class='hit'><span class='num'>  21</span>      except ValueError:</span>
+<span class='hit'><span class='num'>  22</span>          return False</span>
+<span class='hit'><span class='num'>  23</span>      return hmac.compare_digest(digest.hex(), digest_hex)</span>
+<span class=''><span class='num'>  24</span>  </span>
+<span class=''><span class='num'>  25</span>  </span>
+<span class='hit'><span class='num'>  26</span>  def create_token(user_id, role, secret, expires_minutes):</span>
+<span class='hit'><span class='num'>  27</span>      payload = {</span>
+<span class='hit'><span class='num'>  28</span>          &quot;sub&quot;: str(user_id),</span>
+<span class='hit'><span class='num'>  29</span>          &quot;role&quot;: role,</span>
+<span class='hit'><span class='num'>  30</span>          &quot;exp&quot;: datetime.now() + timedelta(minutes=expires_minutes),</span>
+<span class=''><span class='num'>  31</span>      }</span>
+<span class='hit'><span class='num'>  32</span>      return jwt.encode(payload, secret, algorithm=&quot;HS256&quot;)</span>
+<span class=''><span class='num'>  33</span>  </span>
+<span class=''><span class='num'>  34</span>  </span>
+<span class='hit'><span class='num'>  35</span>  def decode_token(token, secret):</span>
+<span class='hit'><span class='num'>  36</span>      return jwt.decode(token, secret, algorithms=[&quot;HS256&quot;])</span>
+</pre>
+<h3 id='app/services/__init__.py'>app/services/__init__.py</h3><pre>
+</pre>
+<h3 id='app/services/auth.py'>app/services/auth.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from app.errors import AuthError, ConflictError, ValidationError</span>
+<span class='hit'><span class='num'>   2</span>  from app.models import ROLE_USER, ROLES, utcnow_iso</span>
+<span class='hit'><span class='num'>   3</span>  from app.security import create_token, hash_password, verify_password</span>
+<span class=''><span class='num'>   4</span>  </span>
+<span class=''><span class='num'>   5</span>  </span>
+<span class='hit'><span class='num'>   6</span>  def public_user(user):</span>
+<span class='hit'><span class='num'>   7</span>      return {</span>
+<span class='hit'><span class='num'>   8</span>          &quot;id&quot;: user[&quot;id&quot;],</span>
+<span class='hit'><span class='num'>   9</span>          &quot;username&quot;: user[&quot;username&quot;],</span>
+<span class='hit'><span class='num'>  10</span>          &quot;role&quot;: user[&quot;role&quot;],</span>
+<span class='hit'><span class='num'>  11</span>          &quot;created_at&quot;: user[&quot;created_at&quot;],</span>
+<span class=''><span class='num'>  12</span>      }</span>
+<span class=''><span class='num'>  13</span>  </span>
+<span class=''><span class='num'>  14</span>  </span>
+<span class='hit'><span class='num'>  15</span>  class AuthService:</span>
+<span class='hit'><span class='num'>  16</span>      def __init__(self, users, secret, expires_minutes, iterations):</span>
+<span class='hit'><span class='num'>  17</span>          self.users = users</span>
+<span class='hit'><span class='num'>  18</span>          self.secret = secret</span>
+<span class='hit'><span class='num'>  19</span>          self.expires_minutes = expires_minutes</span>
+<span class='hit'><span class='num'>  20</span>          self.iterations = iterations</span>
+<span class=''><span class='num'>  21</span>  </span>
+<span class='hit'><span class='num'>  22</span>      def register(self, data):</span>
+<span class='hit'><span class='num'>  23</span>          username = data.get(&quot;username&quot;)</span>
+<span class='hit'><span class='num'>  24</span>          password = data.get(&quot;password&quot;)</span>
+<span class='hit'><span class='num'>  25</span>          role = data.get(&quot;role&quot;, ROLE_USER)</span>
+<span class='hit'><span class='num'>  26</span>          if not isinstance(username, str) or not 3 &lt;= len(username.strip()) &lt;= 50:</span>
+<span class='hit'><span class='num'>  27</span>              raise ValidationError(&quot;username должен содержать от 3 до 50 символов&quot;)</span>
+<span class='hit'><span class='num'>  28</span>          if not isinstance(password, str) or len(password) &lt; 6:</span>
+<span class='hit'><span class='num'>  29</span>              raise ValidationError(&quot;password должен содержать не менее 6 символов&quot;)</span>
+<span class='hit'><span class='num'>  30</span>          if role not in ROLES:</span>
+<span class='hit'><span class='num'>  31</span>              raise ValidationError(&quot;Недопустимая роль, допустимы: &quot; + &quot;, &quot;.join(ROLES))</span>
+<span class='hit'><span class='num'>  32</span>          username = username.strip()</span>
+<span class='hit'><span class='num'>  33</span>          if self.users.get_by_username(username) is not None:</span>
+<span class='hit'><span class='num'>  34</span>              raise ConflictError(&quot;Пользователь с таким именем уже существует&quot;)</span>
+<span class='hit'><span class='num'>  35</span>          password_hash = hash_password(password, self.iterations)</span>
+<span class='hit'><span class='num'>  36</span>          user = self.users.create(username, password_hash, role, utcnow_iso())</span>
+<span class='hit'><span class='num'>  37</span>          return public_user(user)</span>
+<span class=''><span class='num'>  38</span>  </span>
+<span class='hit'><span class='num'>  39</span>      def login(self, data):</span>
+<span class='hit'><span class='num'>  40</span>          username = data.get(&quot;username&quot;)</span>
+<span class='hit'><span class='num'>  41</span>          password = data.get(&quot;password&quot;)</span>
+<span class='hit'><span class='num'>  42</span>          if not isinstance(username, str) or not isinstance(password, str):</span>
+<span class='hit'><span class='num'>  43</span>              raise ValidationError(&quot;Нужно передать username и password&quot;)</span>
+<span class='hit'><span class='num'>  44</span>          user = self.users.get_by_username(username.strip())</span>
+<span class='hit'><span class='num'>  45</span>          if user is None or not verify_password(password, user[&quot;password_hash&quot;]):</span>
+<span class='hit'><span class='num'>  46</span>              raise AuthError(&quot;Неверное имя пользователя или пароль&quot;)</span>
+<span class='hit'><span class='num'>  47</span>          token = create_token(user[&quot;id&quot;], user[&quot;role&quot;], self.secret, self.expires_minutes)</span>
+<span class='hit'><span class='num'>  48</span>          return {&quot;access_token&quot;: token, &quot;token_type&quot;: &quot;Bearer&quot;}</span>
+</pre>
+<h3 id='app/services/comments.py'>app/services/comments.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from app.errors import NotFoundError</span>
+<span class='hit'><span class='num'>   2</span>  from app.models import utcnow_iso</span>
+<span class='hit'><span class='num'>   3</span>  from app.services.common import require_text</span>
+<span class=''><span class='num'>   4</span>  </span>
+<span class=''><span class='num'>   5</span>  </span>
+<span class='hit'><span class='num'>   6</span>  class CommentService:</span>
+<span class='hit'><span class='num'>   7</span>      def __init__(self, comments, tickets):</span>
+<span class='hit'><span class='num'>   8</span>          self.comments = comments</span>
+<span class='hit'><span class='num'>   9</span>          self.tickets = tickets</span>
+<span class=''><span class='num'>  10</span>  </span>
+<span class='hit'><span class='num'>  11</span>      def _check_ticket(self, ticket_id):</span>
+<span class='hit'><span class='num'>  12</span>          if self.tickets.get(ticket_id) is None:</span>
+<span class='hit'><span class='num'>  13</span>              raise NotFoundError(&quot;Заявка не найдена&quot;)</span>
+<span class=''><span class='num'>  14</span>  </span>
+<span class='hit'><span class='num'>  15</span>      def add(self, current_user, ticket_id, data):</span>
+<span class='hit'><span class='num'>  16</span>          self._check_ticket(ticket_id)</span>
+<span class='hit'><span class='num'>  17</span>          text = require_text(data, &quot;text&quot;, 2000)</span>
+<span class='hit'><span class='num'>  18</span>          return self.comments.create(ticket_id, current_user[&quot;id&quot;], text, utcnow_iso())</span>
+<span class=''><span class='num'>  19</span>  </span>
+<span class='hit'><span class='num'>  20</span>      def list(self, ticket_id):</span>
+<span class='hit'><span class='num'>  21</span>          self._check_ticket(ticket_id)</span>
+<span class='hit'><span class='num'>  22</span>          return self.comments.list_by_ticket(ticket_id)</span>
+</pre>
+<h3 id='app/services/common.py'>app/services/common.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from app.errors import ValidationError</span>
+<span class=''><span class='num'>   2</span>  </span>
+<span class=''><span class='num'>   3</span>  </span>
+<span class='hit'><span class='num'>   4</span>  def require_text(data, field, max_length):</span>
+<span class='hit'><span class='num'>   5</span>      value = data.get(field)</span>
+<span class='hit'><span class='num'>   6</span>      if not isinstance(value, str) or not value.strip():</span>
+<span class='hit'><span class='num'>   7</span>          raise ValidationError(f&quot;Поле {field} обязательно и должно быть непустой строкой&quot;)</span>
+<span class='hit'><span class='num'>   8</span>      if len(value) &gt; max_length:</span>
+<span class='hit'><span class='num'>   9</span>          raise ValidationError(f&quot;Поле {field} не должно быть длиннее {max_length} символов&quot;)</span>
+<span class='hit'><span class='num'>  10</span>      return value.strip()</span>
+</pre>
+<h3 id='app/services/tickets.py'>app/services/tickets.py</h3><pre>
+<span class='hit'><span class='num'>   1</span>  from app.errors import ConflictError, ForbiddenError, NotFoundError, ValidationError</span>
+<span class='hit'><span class='num'>   2</span>  from app.models import (</span>
+<span class=''><span class='num'>   3</span>      ALLOWED_TRANSITIONS,</span>
+<span class=''><span class='num'>   4</span>      PRIORITIES,</span>
+<span class=''><span class='num'>   5</span>      ROLE_ADMIN,</span>
+<span class=''><span class='num'>   6</span>      ROLE_EXECUTOR,</span>
+<span class=''><span class='num'>   7</span>      STATUSES,</span>
+<span class=''><span class='num'>   8</span>      utcnow_iso,</span>
+<span class=''><span class='num'>   9</span>  )</span>
+<span class='hit'><span class='num'>  10</span>  from app.services.common import require_text</span>
+<span class=''><span class='num'>  11</span>  </span>
+<span class='hit'><span class='num'>  12</span>  MAX_PAGE_SIZE = 100</span>
+<span class=''><span class='num'>  13</span>  </span>
+<span class=''><span class='num'>  14</span>  </span>
+<span class='hit'><span class='num'>  15</span>  def public_ticket(ticket):</span>
+<span class='hit'><span class='num'>  16</span>      return {</span>
+<span class='hit'><span class='num'>  17</span>          &quot;id&quot;: ticket[&quot;id&quot;],</span>
+<span class='hit'><span class='num'>  18</span>          &quot;subject&quot;: ticket[&quot;subject&quot;],</span>
+<span class='hit'><span class='num'>  19</span>          &quot;description&quot;: ticket[&quot;description&quot;],</span>
+<span class='hit'><span class='num'>  20</span>          &quot;priority&quot;: ticket[&quot;priority&quot;],</span>
+<span class='hit'><span class='num'>  21</span>          &quot;status&quot;: ticket[&quot;status&quot;],</span>
+<span class='hit'><span class='num'>  22</span>          &quot;author_id&quot;: ticket[&quot;author_id&quot;],</span>
+<span class='hit'><span class='num'>  23</span>          &quot;assignee_id&quot;: ticket[&quot;assignee_id&quot;],</span>
+<span class='hit'><span class='num'>  24</span>          &quot;created_at&quot;: ticket[&quot;created_at&quot;],</span>
+<span class='hit'><span class='num'>  25</span>          &quot;updated_at&quot;: ticket[&quot;updated_at&quot;],</span>
+<span class=''><span class='num'>  26</span>      }</span>
+<span class=''><span class='num'>  27</span>  </span>
+<span class=''><span class='num'>  28</span>  </span>
+<span class='hit'><span class='num'>  29</span>  def _check_priority(value):</span>
+<span class='hit'><span class='num'>  30</span>      if value not in PRIORITIES:</span>
+<span class='hit'><span class='num'>  31</span>          raise ValidationError(&quot;Недопустимый приоритет, допустимы: &quot; + &quot;, &quot;.join(PRIORITIES))</span>
+<span class='hit'><span class='num'>  32</span>      return value</span>
+<span class=''><span class='num'>  33</span>  </span>
+<span class=''><span class='num'>  34</span>  </span>
+<span class='hit'><span class='num'>  35</span>  def _check_status(value):</span>
+<span class='hit'><span class='num'>  36</span>      if value not in STATUSES:</span>
+<span class='hit'><span class='num'>  37</span>          raise ValidationError(&quot;Недопустимый статус, допустимы: &quot; + &quot;, &quot;.join(STATUSES))</span>
+<span class='hit'><span class='num'>  38</span>      return value</span>
+<span class=''><span class='num'>  39</span>  </span>
+<span class=''><span class='num'>  40</span>  </span>
+<span class='hit'><span class='num'>  41</span>  class TicketService:</span>
+<span class='hit'><span class='num'>  42</span>      def __init__(self, tickets, users):</span>
+<span class='hit'><span class='num'>  43</span>          self.tickets = tickets</span>
+<span class='hit'><span class='num'>  44</span>          self.users = users</span>
+<span class=''><span class='num'>  45</span>  </span>
+<span class='hit'><span class='num'>  46</span>      def _get_active(self, ticket_id):</span>
+<span class='hit'><span class='num'>  47</span>          ticket = self.tickets.get(ticket_id)</span>
+<span class='hit'><span class='num'>  48</span>          if ticket is None or ticket[&quot;is_deleted&quot;]:</span>
+<span class='hit'><span class='num'>  49</span>              raise NotFoundError(&quot;Заявка не найдена&quot;)</span>
+<span class='hit'><span class='num'>  50</span>          return ticket</span>
+<span class=''><span class='num'>  51</span>  </span>
+<span class='hit'><span class='num'>  52</span>      def create(self, current_user, data):</span>
+<span class='hit'><span class='num'>  53</span>          subject = require_text(data, &quot;subject&quot;, 200)</span>
+<span class='hit'><span class='num'>  54</span>          description = require_text(data, &quot;description&quot;, 5000)</span>
+<span class='hit'><span class='num'>  55</span>          priority = _check_priority(data.get(&quot;priority&quot;, &quot;MEDIUM&quot;))</span>
+<span class='hit'><span class='num'>  56</span>          assignee_id = data.get(&quot;assignee_id&quot;)</span>
+<span class='hit'><span class='num'>  57</span>          if assignee_id is not None and not isinstance(assignee_id, int):</span>
+<span class='hit'><span class='num'>  58</span>              raise ValidationError(&quot;assignee_id должен быть числом&quot;)</span>
+<span class='hit'><span class='num'>  59</span>          ticket_id = self.tickets.create(</span>
+<span class='hit'><span class='num'>  60</span>              subject, description, priority, current_user[&quot;id&quot;], assignee_id, utcnow_iso()</span>
+<span class=''><span class='num'>  61</span>          )</span>
+<span class='hit'><span class='num'>  62</span>          return public_ticket(self.tickets.get(ticket_id))</span>
+<span class=''><span class='num'>  63</span>  </span>
+<span class='hit'><span class='num'>  64</span>      def list(self, status=None, priority=None, assignee_id=None, page=1, page_size=10):</span>
+<span class='hit'><span class='num'>  65</span>          if status is not None:</span>
+<span class='hit'><span class='num'>  66</span>              _check_status(status)</span>
+<span class='hit'><span class='num'>  67</span>          if priority is not None:</span>
+<span class='hit'><span class='num'>  68</span>              _check_priority(priority)</span>
+<span class='hit'><span class='num'>  69</span>          if page &lt; 1 or page_size &lt; 1:</span>
+<span class='hit'><span class='num'>  70</span>              raise ValidationError(&quot;page и page_size должны быть не меньше 1&quot;)</span>
+<span class='hit'><span class='num'>  71</span>          page_size = min(page_size, MAX_PAGE_SIZE)</span>
+<span class='hit'><span class='num'>  72</span>          offset = (page - 1) * page_size</span>
+<span class='hit'><span class='num'>  73</span>          items = self.tickets.list(status, priority, assignee_id, page_size, offset)</span>
+<span class='hit'><span class='num'>  74</span>          total = self.tickets.count(status, priority, assignee_id)</span>
+<span class='hit'><span class='num'>  75</span>          return {</span>
+<span class='hit'><span class='num'>  76</span>              &quot;items&quot;: [public_ticket(t) for t in items],</span>
+<span class='hit'><span class='num'>  77</span>              &quot;total&quot;: total,</span>
+<span class='hit'><span class='num'>  78</span>              &quot;page&quot;: page,</span>
+<span class='hit'><span class='num'>  79</span>              &quot;page_size&quot;: page_size,</span>
+<span class=''><span class='num'>  80</span>          }</span>
+<span class=''><span class='num'>  81</span>  </span>
+<span class='hit'><span class='num'>  82</span>      def get(self, ticket_id):</span>
+<span class='hit'><span class='num'>  83</span>          return public_ticket(self._get_active(ticket_id))</span>
+<span class=''><span class='num'>  84</span>  </span>
+<span class='hit'><span class='num'>  85</span>      def update(self, current_user, ticket_id, data):</span>
+<span class='hit'><span class='num'>  86</span>          ticket = self._get_active(ticket_id)</span>
+<span class='hit'><span class='num'>  87</span>          is_admin = current_user[&quot;role&quot;] == ROLE_ADMIN</span>
+<span class='hit'><span class='num'>  88</span>          is_author = ticket[&quot;author_id&quot;] == current_user[&quot;id&quot;]</span>
+<span class='hit'><span class='num'>  89</span>          is_assignee = ticket[&quot;assignee_id&quot;] == current_user[&quot;id&quot;]</span>
+<span class='hit'><span class='num'>  90</span>          if not (is_admin or is_author or is_assignee):</span>
+<span class='hit'><span class='num'>  91</span>              raise ForbiddenError(&quot;Редактировать заявку может автор, исполнитель или ADMIN&quot;)</span>
+<span class='hit'><span class='num'>  92</span>          fields = {}</span>
+<span class='hit'><span class='num'>  93</span>          if &quot;subject&quot; in data:</span>
+<span class='hit'><span class='num'>  94</span>              fields[&quot;subject&quot;] = require_text(data, &quot;subject&quot;, 200)</span>
+<span class='hit'><span class='num'>  95</span>          if &quot;description&quot; in data:</span>
+<span class='hit'><span class='num'>  96</span>              fields[&quot;description&quot;] = require_text(data, &quot;description&quot;, 5000)</span>
+<span class='hit'><span class='num'>  97</span>          if &quot;priority&quot; in data:</span>
+<span class='hit'><span class='num'>  98</span>              fields[&quot;priority&quot;] = _check_priority(data[&quot;priority&quot;])</span>
+<span class='hit'><span class='num'>  99</span>          if &quot;status&quot; in data:</span>
+<span class='miss'><span class='num'> 100</span>              fields[&quot;status&quot;] = _check_status(data[&quot;status&quot;])</span>
+<span class='hit'><span class='num'> 101</span>          if not fields:</span>
+<span class='hit'><span class='num'> 102</span>              raise ValidationError(&quot;Не переданы поля для изменения&quot;)</span>
+<span class='hit'><span class='num'> 103</span>          self.tickets.update(ticket_id, fields, utcnow_iso())</span>
+<span class='hit'><span class='num'> 104</span>          return public_ticket(self.tickets.get(ticket_id))</span>
+<span class=''><span class='num'> 105</span>  </span>
+<span class='hit'><span class='num'> 106</span>      def delete(self, current_user, ticket_id):</span>
+<span class='hit'><span class='num'> 107</span>          if current_user[&quot;role&quot;] != ROLE_ADMIN:</span>
+<span class='hit'><span class='num'> 108</span>              raise ForbiddenError(&quot;Удалять заявки может только ADMIN&quot;)</span>
+<span class='hit'><span class='num'> 109</span>          self._get_active(ticket_id)</span>
+<span class='hit'><span class='num'> 110</span>          self.tickets.soft_delete(ticket_id, utcnow_iso())</span>
+<span class=''><span class='num'> 111</span>  </span>
+<span class='hit'><span class='num'> 112</span>      def change_status(self, current_user, ticket_id, data):</span>
+<span class='hit'><span class='num'> 113</span>          ticket = self._get_active(ticket_id)</span>
+<span class='hit'><span class='num'> 114</span>          is_admin = current_user[&quot;role&quot;] == ROLE_ADMIN</span>
+<span class='hit'><span class='num'> 115</span>          if not (is_admin or ticket[&quot;assignee_id&quot;] == current_user[&quot;id&quot;]):</span>
+<span class='hit'><span class='num'> 116</span>              raise ForbiddenError(&quot;Менять статус может исполнитель заявки или ADMIN&quot;)</span>
+<span class='hit'><span class='num'> 117</span>          new_status = _check_status(data.get(&quot;status&quot;))</span>
+<span class='hit'><span class='num'> 118</span>          current = ticket[&quot;status&quot;]</span>
+<span class='hit'><span class='num'> 119</span>          if new_status not in ALLOWED_TRANSITIONS[current]:</span>
+<span class='hit'><span class='num'> 120</span>              raise ConflictError(f&quot;Переход {current} -&gt; {new_status} запрещён&quot;)</span>
+<span class='hit'><span class='num'> 121</span>          self.tickets.set_status(ticket_id, new_status)</span>
+<span class='hit'><span class='num'> 122</span>          return public_ticket(self.tickets.get(ticket_id))</span>
+<span class=''><span class='num'> 123</span>  </span>
+<span class='hit'><span class='num'> 124</span>      def assign(self, current_user, ticket_id, data):</span>
+<span class='hit'><span class='num'> 125</span>          if current_user[&quot;role&quot;] != ROLE_ADMIN:</span>
+<span class='hit'><span class='num'> 126</span>              raise ForbiddenError(&quot;Назначать исполнителя может только ADMIN&quot;)</span>
+<span class='hit'><span class='num'> 127</span>          self._get_active(ticket_id)</span>
+<span class='hit'><span class='num'> 128</span>          assignee_id = data.get(&quot;assignee_id&quot;)</span>
+<span class='hit'><span class='num'> 129</span>          if not isinstance(assignee_id, int):</span>
+<span class='hit'><span class='num'> 130</span>              raise ValidationError(&quot;assignee_id должен быть числом&quot;)</span>
+<span class='hit'><span class='num'> 131</span>          executor = self.users.get_by_id(assignee_id)</span>
+<span class='hit'><span class='num'> 132</span>          if executor is None:</span>
+<span class='hit'><span class='num'> 133</span>              raise NotFoundError(&quot;Пользователь не найден&quot;)</span>
+<span class='hit'><span class='num'> 134</span>          if executor[&quot;role&quot;] != ROLE_EXECUTOR:</span>
+<span class='hit'><span class='num'> 135</span>              raise ValidationError(&quot;Исполнителем может быть только пользователь с ролью EXECUTOR&quot;)</span>
+<span class='hit'><span class='num'> 136</span>          self.tickets.set_assignee(ticket_id, assignee_id, utcnow_iso())</span>
+<span class='hit'><span class='num'> 137</span>          return public_ticket(self.tickets.get(ticket_id))</span>
+</pre>
+</body></html>
